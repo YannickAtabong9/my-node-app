@@ -28,7 +28,7 @@ jobs:
       run: docker build -t my-node-app .
 
     - name: Set up Snyk for dependency scanning
-      run: curl -sL https://snyk.io/install | bash
+      run: curl -sL https://github.com/snyk/snyk/releases/download/v1.123.0/snyk-linux -o /usr/local/bin/snyk && chmod +x /usr/local/bin/snyk
 
     - name: Run Snyk dependency scan
       run: snyk test --json > snyk_report.json
