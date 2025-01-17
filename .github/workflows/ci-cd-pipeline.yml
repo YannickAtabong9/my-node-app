@@ -1,0 +1,73 @@
+name: DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js (if applicable)
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install dependencies (for Node.js apps)
+      run: |
+        npm install
+
+    - name: Build Docker image (for Dockerized apps)
+      run: |
+        docker build -t my-node-app .
+
+    - name: Run Docker container for staging (for Dockerized apps)
+      run: |
+        docker run -d -p 3000:3000 my-node-app
+
+    - name: Wait for the application to start
+      run: |
+        sleep 10  # Wait for the app to fully start before scanning
+
+    - name: Run OWASP ZAP Scan (Dynamic Security Testing)
+      run: |
+        # Install OWASP ZAP
+        curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_unix.tar.gz | tar -xz
+        ./ZAP_2.11.1/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
+
+    - name: Display OWASP ZAP Scan Results in Logs
+      run: |
+        echo "OWASP ZAP Scan Results:"
+        cat zap_report.json
+
+    - name: Filter and Display Critical Vulnerabilities from ZAP
+      run: |
+        echo "Critical Vulnerabilities:"
+        jq '.site[].alerts[] | select(.risk == "High")' zap_report.json
+
+    - name: Set up Snyk CLI (for dependency scanning)
+      run: |
+        # Install Snyk CLI
+        curl -sL https://snyk.io/install | bash
+
+    - name: Run Snyk Test for Dependency Scanning
+      run: |
+        snyk test --all-projects --json > snyk_report.json
+
+    - name: Display Snyk Results in Logs
+      run: |
+        echo "Snyk Test Results:"
+        cat snyk_report.json
+
+    - name: Filter and Display Critical Snyk Issues
+      run: |
+        echo "Critical Issues Found by Snyk:"
+        jq '.issues[] | select(.severity == "high")' snyk_report.json
