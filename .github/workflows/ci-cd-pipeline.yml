@@ -32,8 +32,8 @@ jobs:
 
       - name: Run OWASP ZAP for security scan
         run: |
-          curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_unix.tar.gz | tar -xz
-          ./ZAP_2.11.1/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
+           curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Linux.tar.gz | tar -xz
+    ./ZAP_2.11.1/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
 
       - name: Display OWASP ZAP scan results
         run: cat zap_report.json
@@ -47,5 +47,4 @@ jobs:
       - name: Upload Snyk scan results
         uses: actions/upload-artifact@v3
         with:
-          name: snyk-report
           path: snyk_report.json
