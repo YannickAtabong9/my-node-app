@@ -27,8 +27,10 @@ jobs:
         wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
         unzip sonar-scanner-cli-4.8.0.2856-linux.zip
         sudo mv sonar-scanner-4.8.0.2856-linux /usr/local/sonar-scanner
-        echo "export PATH=\$PATH:/usr/local/sonar-scanner/bin" >> $GITHUB_ENV
         echo "Sonar Scanner installed."
+        # Make sure the SonarScanner is in the PATH
+        echo "/usr/local/sonar-scanner/bin" >> $GITHUB_PATH
+        echo "SonarScanner added to PATH"
 
     # Step 4: SonarCloud analysis
     - name: Run SonarCloud analysis
@@ -41,4 +43,3 @@ jobs:
           -X  # Enable full debug output
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
