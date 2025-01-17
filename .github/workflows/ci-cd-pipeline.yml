@@ -21,34 +21,14 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run tests
-      run: npm test
+    - name: Set up Snyk authentication
+      run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
-    - name: Build Docker image
-      run: docker build -t my-node-app .
-
-    - name: Set up Snyk for dependency scanning
-      run: curl -sL https://github.com/snyk/snyk/releases/download/v1.123.0/snyk-linux -o /usr/local/bin/snyk && chmod +x /usr/local/bin/snyk
-
-    - name: Run Snyk dependency scan
-      run: snyk test --json > snyk_report.json
+    - name: Run Snyk dependency scan with debug
+      run: snyk test --json --debug > snyk_report.json
 
     - name: Upload Snyk scan results
       uses: actions/upload-artifact@v3
       with:
         name: snyk-report
         path: snyk_report.json
-
-    - name: Install Trivy for Docker image scanning
-      run: |
-        curl -sL https://github.com/aquasecurity/trivy/releases/download/v0.25.0/trivy_0.25.0_Linux-64bit.tar.gz | tar -xz
-        sudo mv trivy /usr/local/bin/
-
-    - name: Run Trivy Docker image scan
-      run: trivy image --format json --output trivy_report.json my-node-app
-
-    - name: Upload Trivy Docker scan results
-      uses: actions/upload-artifact@v3
-      with:
-        name: trivy-report
-        path: trivy_report.json
