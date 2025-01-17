@@ -41,6 +41,9 @@ jobs:
     - name: Display OWASP ZAP scan results
       run: cat zap_report.json
 
+    - name: Run tests
+      run: echo "No tests defined yet"
+
     - name: Upload OWASP ZAP results
       uses: actions/upload-artifact@v3
       with:
