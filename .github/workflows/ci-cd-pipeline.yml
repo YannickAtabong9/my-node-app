@@ -25,10 +25,11 @@ jobs:
           mv sonar-scanner-4.8.0.2856-linux /usr/local/sonar-scanner
           export PATH=$PATH:/usr/local/sonar-scanner/bin
           echo "SonarScanner installed."
-          
-      - name: Verify SonarScanner installation
-        run: sonar-scanner -v
         
+      - name: Verify SonarScanner installation
+        run: |
+          sonar-scanner -v
+
       - name: Run SonarScanner
         run: |
           echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.25-9/x64" >> $GITHUB_ENV
