@@ -30,20 +30,6 @@ jobs:
       - name: Run Snyk dependency scan with debug
         run: snyk test --json --debug > snyk_report.json
 
-      - name: Run OWASP Dependency-Check
-        uses: dependency-check-action@v2
-        with:
-          project: my-node-app
-          scanPath: .
-          format: json
-          outputDirectory: ./dependency-check-results
-
-      - name: Upload Dependency-Check report
-        uses: actions/upload-artifact@v3
-        with:
-          name: dependency-check-report
-          path: ./dependency-check-results/dependency-check-report.json
-
       - name: Upload Snyk scan results
         uses: actions/upload-artifact@v4
         with:
@@ -51,7 +37,7 @@ jobs:
           path: snyk_report.json
 
       # SonarQube Integration
-      - name: SonarCloud Setup
+      - name: Set up SonarCloud
         uses: sonarsource/sonarcloud-github-action@v1
         with:
           organization: your-sonarcloud-org
