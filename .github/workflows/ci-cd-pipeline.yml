@@ -30,8 +30,35 @@ jobs:
       - name: Run Snyk dependency scan with debug
         run: snyk test --json --debug > snyk_report.json
 
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check-action@v2
+        with:
+          project: my-node-app
+          scanPath: .
+          format: json
+          outputDirectory: ./dependency-check-results
+
+      - name: Upload Dependency-Check report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: ./dependency-check-results/dependency-check-report.json
+
       - name: Upload Snyk scan results
         uses: actions/upload-artifact@v4
         with:
           name: snyk-report
           path: snyk_report.json
+
+      # SonarQube Integration
+      - name: Set up SonarQube
+        uses: SonarSource/sonarcloud-github-action@v1
+        with:
+          sonar_token: ${{ secrets.SONARQUBE_TOKEN }}
+
+      - name: Run SonarQube analysis
+        run: |
+          curl -sS https://downloads.sonarsource.com/sonar-scanner-cli/sonar-scanner-4.7.0.2747-linux.zip -o sonar-scanner.zip
+          unzip sonar-scanner.zip
+          export PATH=$PATH:$(pwd)/sonar-scanner-4.7.0.2747-linux/bin
+          sonar-scanner -Dsonar.projectKey=my-node-app -Dsonar.sources=.
