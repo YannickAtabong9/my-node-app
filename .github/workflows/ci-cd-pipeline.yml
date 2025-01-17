@@ -4,25 +4,22 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  sonarcloud_analysis:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the code
+    # Step 1: Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Step 2: Set up Java
+    # Step 2: Set up Java (Temurin JDK 11)
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
         java-version: '11'
-        distribution: 'temurin'  # Changed to temurin
+        distribution: 'temurin'  # Temurin is a JDK distribution
 
     # Step 3: Install Sonar Scanner
     - name: Install Sonar Scanner
@@ -34,14 +31,14 @@ jobs:
         echo "Sonar Scanner installed."
 
     # Step 4: SonarCloud analysis
-    - name: SonarCloud analysis
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Run SonarCloud analysis
       run: |
-        /usr/local/sonar-scanner/bin/sonar-scanner \
+        sonar-scanner \
           -Dsonar.projectKey=bbfeea321fdaf9a89b0556b70c1eddcd95a54caa \
           -Dsonar.sources=. \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -X  # Added the -X flag for debug output
-      shell: bash
+          -X  # Enable full debug output
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
