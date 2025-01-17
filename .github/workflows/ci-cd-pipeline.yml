@@ -1,4 +1,4 @@
-name: DevSecOps CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -9,65 +9,49 @@ on:
       - main
 
 jobs:
-  deploy-and-scan:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Set up Node.js (if applicable)
-      uses: actions/setup-node@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
         node-version: '16'
 
-    - name: Install dependencies (for Node.js apps)
-      run: |
-        npm install
+    - name: Install dependencies
+      run: npm install
 
-    - name: Build Docker image (for Dockerized apps)
-      run: |
-        docker build -t my-node-app .
+    - name: Run tests
+      run: npm test
 
-    - name: Run Docker container for staging (for Dockerized apps)
-      run: |
-        docker run -d -p 3000:3000 my-node-app
+    - name: Build Docker image
+      run: docker build -t my-node-app .
 
-    - name: Wait for the application to start
+    - name: Run OWASP ZAP for security scan
       run: |
-        sleep 10  # Wait for the app to fully start before scanning
-
-    - name: Run OWASP ZAP Scan (Dynamic Security Testing)
-      run: |
-        # Install OWASP ZAP
         curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_unix.tar.gz | tar -xz
         ./ZAP_2.11.1/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
 
-    - name: Display OWASP ZAP Scan Results in Logs
-      run: |
-        echo "OWASP ZAP Scan Results:"
-        cat zap_report.json
+    - name: Display OWASP ZAP scan results
+      run: cat zap_report.json
 
-    - name: Filter and Display Critical Vulnerabilities from ZAP
-      run: |
-        echo "Critical Vulnerabilities:"
-        jq '.site[].alerts[] | select(.risk == "High")' zap_report.json
+    - name: Upload OWASP ZAP results
+      uses: actions/upload-artifact@v3
+      with:
+        name: zap-report
+        path: zap_report.json
 
-    - name: Set up Snyk CLI (for dependency scanning)
-      run: |
-        # Install Snyk CLI
-        curl -sL https://snyk.io/install | bash
+    - name: Set up Snyk for dependency scanning
+      run: curl -sL https://snyk.io/install | bash
 
-    - name: Run Snyk Test for Dependency Scanning
-      run: |
-        snyk test --all-projects --json > snyk_report.json
+    - name: Run Snyk dependency scan
+      run: snyk test --json > snyk_report.json
 
-    - name: Display Snyk Results in Logs
-      run: |
-        echo "Snyk Test Results:"
-        cat snyk_report.json
-
-    - name: Filter and Display Critical Snyk Issues
-      run: |
-        echo "Critical Issues Found by Snyk:"
-        jq '.issues[] | select(.severity == "high")' snyk_report.json
+    - name: Upload Snyk scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: snyk-report
+        path: snyk_report.json
