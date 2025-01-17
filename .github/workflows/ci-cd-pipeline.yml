@@ -22,25 +22,10 @@ jobs:
       run: npm install
 
     - name: Run tests
-      run: |
-        echo "No tests defined yet" && exit 0  # placeholder test to avoid failure
+      run: npm test
 
     - name: Build Docker image
       run: docker build -t my-node-app .
-
-    - name: Run OWASP ZAP for security scan
-      run: |
-        curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.16.0/ZAP_2.16.0_Linux.tar.gz | tar -xz
-    ./ZAP_2.16.0/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
-
-    - name: Display OWASP ZAP scan results
-      run: cat zap_report.json
-
-    - name: Upload OWASP ZAP results
-      uses: actions/upload-artifact@v3
-      with:
-        name: zap-report
-        path: zap_report.json
 
     - name: Set up Snyk for dependency scanning
       run: curl -sL https://snyk.io/install | bash
@@ -54,3 +39,16 @@ jobs:
         name: snyk-report
         path: snyk_report.json
 
+    - name: Install Trivy for Docker image scanning
+      run: |
+        curl -sL https://github.com/aquasecurity/trivy/releases/download/v0.25.0/trivy_0.25.0_Linux-64bit.tar.gz | tar -xz
+        sudo mv trivy /usr/local/bin/
+
+    - name: Run Trivy Docker image scan
+      run: trivy image --format json --output trivy_report.json my-node-app
+
+    - name: Upload Trivy Docker scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: trivy-report
+        path: trivy_report.json
