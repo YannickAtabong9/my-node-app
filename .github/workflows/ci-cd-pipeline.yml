@@ -40,10 +40,10 @@ jobs:
       - name: Set SONAR_TOKEN
         run: echo "SONAR_TOKEN=${{ secrets.SONARQUBE_TOKEN }}" >> $GITHUB_ENV
 
-      # Install sonar-scanner manually with updated download link
+      # Install sonar-scanner manually
       - name: Install sonar-scanner
         run: |
-          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+          wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/4.8.0.2856/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner-cli-4.8.0.2856-linux.zip
           mv sonar-scanner-4.8.0.2856-linux /usr/local/sonar-scanner
           export PATH=$PATH:/usr/local/sonar-scanner/bin
