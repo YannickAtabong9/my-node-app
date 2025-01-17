@@ -30,8 +30,16 @@ jobs:
     - name: Run Snyk dependency scan with debug
       run: snyk test --json --debug > snyk_report.json
 
+    - name: Run OWASP Dependency-Check
+  uses: dependency-check-action@v2
+  with:
+    project: my-node-app
+    scanPath: .
+    format: json
+    outputDirectory: ./dependency-check-results
+
     - name: Upload Snyk scan results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: snyk-report
         path: snyk_report.json
