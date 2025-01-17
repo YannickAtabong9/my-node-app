@@ -36,14 +36,13 @@ jobs:
           name: snyk-report
           path: snyk_report.json
 
-      # SonarQube Integration
+      # SonarQube Integration (corrected)
       - name: Set up SonarCloud
         uses: sonarsource/sonarcloud-github-action@v1
         with:
-          organization: your-sonarcloud-org
-          token: ${{ secrets.SONARQUBE_TOKEN }}
-
-      - name: Run SonarQube analysis
+          sonar-token: ${{ secrets.SONARQUBE_TOKEN }}
+          
+      - name: Run SonarCloud analysis
         run: |
           sonar-scanner \
             -Dsonar.projectKey=my-node-app \
