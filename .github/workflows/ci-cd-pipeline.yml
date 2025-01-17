@@ -30,8 +30,8 @@ jobs:
 
     - name: Run OWASP ZAP for security scan
       run: |
-        curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Linux.tar.gz | tar -xz
-        ./ZAP_2.11.1/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
+        curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.16.0/ZAP_2.16.0_Linux.tar.gz | tar -xz
+    ./ZAP_2.16.0/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
 
     - name: Display OWASP ZAP scan results
       run: cat zap_report.json
