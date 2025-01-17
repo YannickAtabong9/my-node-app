@@ -51,11 +51,11 @@ jobs:
           path: snyk_report.json
 
       # SonarQube Integration
-      - name: Install SonarQube Scanner
-        run: |
-          curl -sS https://downloads.sonarsource.com/sonar-scanner-cli/sonar-scanner-4.7.0.2747-linux.zip -o sonar-scanner.zip
-          unzip sonar-scanner.zip
-          export PATH=$PATH:$(pwd)/sonar-scanner-4.7.0.2747-linux/bin
+      - name: SonarCloud Setup
+        uses: sonarsource/sonarcloud-github-action@v1
+        with:
+          organization: your-sonarcloud-org
+          token: ${{ secrets.SONARQUBE_TOKEN }}
 
       - name: Run SonarQube analysis
         run: |
