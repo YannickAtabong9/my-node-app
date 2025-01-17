@@ -37,12 +37,15 @@ jobs:
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner-cli-4.8.0.2856-linux.zip
           sudo mv sonar-scanner-4.8.0.2856-linux /usr/local/sonar-scanner
-          echo "export PATH=\$PATH:/usr/local/sonar-scanner/bin" >> $GITHUB_ENV
+          echo "/usr/local/sonar-scanner/bin" | sudo tee -a /etc/environment
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # Step 6: Run SonarCloud analysis
       - name: SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PATH: /usr/local/sonar-scanner/bin:$PATH
         run: |
           sonar-scanner \
             -Dsonar.projectKey=bbfeea321fdaf9a89b0556b70c1eddcd95a54caa \
