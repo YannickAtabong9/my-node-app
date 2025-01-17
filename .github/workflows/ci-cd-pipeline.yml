@@ -36,12 +36,11 @@ jobs:
           name: snyk-report
           path: snyk_report.json
 
-      # SonarQube Integration (corrected)
-      - name: Set up SonarCloud
-        uses: sonarsource/sonarcloud-github-action@v1
-        with:
-          sonar-token: ${{ secrets.SONARQUBE_TOKEN }}
-          
+      # Set SONAR_TOKEN environment variable
+      - name: Set SONAR_TOKEN
+        run: echo "SONAR_TOKEN=${{ secrets.SONARQUBE_TOKEN }}" >> $GITHUB_ENV
+
+      # SonarCloud analysis
       - name: Run SonarCloud analysis
         run: |
           sonar-scanner \
