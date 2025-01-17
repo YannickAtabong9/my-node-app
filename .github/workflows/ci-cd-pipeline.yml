@@ -53,8 +53,4 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         shell: bash
 
-        - name: Debug SonarScanner Installation
-  run: |
-    echo $PATH
-    sonar-scanner -v
-
+        
