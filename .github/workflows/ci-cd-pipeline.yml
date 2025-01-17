@@ -1,60 +1,56 @@
-name: Node.js CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Node.js (if you're using a Node.js app)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 16
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      - name: Install Snyk CLI
-        run: npm install -g snyk
+      # Step 4: Run tests
+      - name: Run tests
+        run: npm test
 
-      - name: Set up Snyk authentication
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
-
-      - name: Run Snyk dependency scan with debug
-        run: snyk test --json --debug > snyk_report.json
-
-      - name: Upload Snyk scan results
-        uses: actions/upload-artifact@v4
-        with:
-          name: snyk-report
-          path: snyk_report.json
-
-      # Set SONAR_TOKEN environment variable
-      - name: Set SONAR_TOKEN
-        run: echo "SONAR_TOKEN=${{ secrets.SONARQUBE_TOKEN }}" >> $GITHUB_ENV
-
-      # Install sonar-scanner manually
-       - name: Install sonar-scanner
+      # Step 5: Set up SonarScanner
+      - name: Install SonarScanner
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner-cli-4.8.0.2856-linux.zip
           sudo mv sonar-scanner-4.8.0.2856-linux /usr/local/sonar-scanner
-          echo "export PATH=\$PATH:/usr/local/sonar-scanner/bin" >> ~/.bashrc
-          source ~/.bashrc
-          echo "sonar-scanner installed."
+          echo "export PATH=\$PATH:/usr/local/sonar-scanner/bin" >> $GITHUB_ENV
 
-      # SonarCloud analysis
-      - name: Run SonarCloud analysis
+      # Step 6: Run SonarCloud analysis
+      - name: SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            -Dsonar.projectKey=my-node-app \
+            -Dsonar.projectKey=<your_project_key> \
             -Dsonar.sources=. \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      # Step 7: Deploy (optional)
+      # Uncomment this step and configure deployment if needed
+      # - name: Deploy to production
+      #   run: echo "Deploying to production..."
