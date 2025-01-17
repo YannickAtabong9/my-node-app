@@ -7,57 +7,45 @@ on:
   pull_request:
     branches:
       - main
-jobs:
-  build-and-test:
-    runs-on: ubuntu-22.04
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Run tests
-      run: npm test
+      - name: Run tests
+        run: npm test
 
-    - name: Build Docker image
-      run: docker build -t my-node-app .
+      - name: Build Docker image
+        run: docker build -t my-node-app .
 
-    - name: Run OWASP ZAP for security scan
-      run: |
-        curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_unix.tar.gz | tar -xz
-        ./ZAP_2.11.1/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
+      - name: Run OWASP ZAP for security scan
+        run: |
+          curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_unix.tar.gz | tar -xz
+          ./ZAP_2.11.1/zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.json
 
-    - name: Display OWASP ZAP scan results
-      run: cat zap_report.json
+      - name: Display OWASP ZAP scan results
+        run: cat zap_report.json
 
-    - name: Run tests
-      run: echo "No tests defined yet"
+      - name: Set up Snyk for dependency scanning
+        run: curl -sL https://snyk.io/install | bash
 
-    - name: Upload OWASP ZAP results
-      uses: actions/upload-artifact@v3
-      with:
-        name: zap-report
-        path: zap_report.json
+      - name: Run Snyk dependency scan
+        run: snyk test --json > snyk_report.json
 
-    - name: Set up Snyk for dependency scanning
-      run: curl -sL https://snyk.io/install | bash
-
-    - name: Run Snyk dependency scan
-      run: snyk test --json > snyk_report.json
-
-    - name: Upload Snyk scan results
-      uses: actions/upload-artifact@v3
-      with:
-        name: snyk-report
-        path: snyk_report.json
+      - name: Upload Snyk scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: snyk-report
+          path: snyk_report.json
