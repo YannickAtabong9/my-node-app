@@ -43,5 +43,5 @@ jobs:
           -Dsonar.sources=. \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -X
+          -X  # Added the -X flag for debug output
       shell: bash
