@@ -22,6 +22,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '11'
+        distribution: 'adoptopenjdk'  # Add the distribution input here
 
     # Step 3: Install Sonar Scanner
     - name: Install Sonar Scanner
